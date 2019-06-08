@@ -29,7 +29,7 @@ def V(q, r, x, y, z):
     fac = 1/(4*np.pi*e_a)
     return fac*q/(den)
 
-nx, ny, ny = 100, 100, 1000
+nx, ny, nz = 100, 100, 100
 
 x = np.linspace(-0.025, 0.025, nx)
 y = np.linspace(-0.025, 0.025, ny)
@@ -37,11 +37,36 @@ z = np.linspace(0, 1, nz)
 
 X,Y,Z = np.meshgrid(x, y, z)
 
-cargas_positivas = []
-for i in N_p:
+cargas = []
+for i in range(N_p):
     q = Q
-    cargas_positivas.append(q, (#posicion))
+    for j in x:
+        for k in y:
+            r = np.sqrt(x**2 + y**2)
+            theta = np.arctan(y/x)
+    cargas.append((q, (r, theta, 1)))
 
+cargas
+for i in range(N_n):
+    q = -Q
+    for j in x:
+        for k in y:
+            r = np.sqrt(x**2 + y**2)
+            theta = np.arctan(y/x)
+    cargas.append((q, (r, theta, 0)))
+
+Ex, Ey, Ez = np.zeros((ny, nx, nz)), np.zeros((ny, nx, nz)), np.zeros((nx,ny,nz))
+
+
+for carga in cargas:
+    ex, ey, ez = E(*carga, x=X, y=Y, z=Z)
+    Ex += ex
+    Ey += ey
+    Ez += ez
 #plot
 fig = plt.figure()
 ax = fig.add_subplot(111, projection = '3d')
+
+ax.quiver(x, y, z, Ex, Ey, Ez)
+
+plt.show()
